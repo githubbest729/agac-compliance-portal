@@ -9,26 +9,30 @@ const QA=['OPC UA/DA comms verified','SQL redundancy tested','Alarm escalation m
 const ROLES=['SCADA Lead','Project Manager','QHSE Officer','Client Witness'];
 const NAV=[['dash','Dashboard','chart'],['gen','Generate','doc'],['docs','Documents','shield'],['plan','Plan & QA','list'],['rep','Reports','sig'],['store','Backup','db']];
 const bc='BroadcastChannel'in window?new BroadcastChannel('cpp'):null;
-let view='dash',pads=[],P=null,PR=[],wl=null,reg=null,ip=null;
+let PEND=0,view='dash',pads=[],P=null,PR=[],wl=null,reg=null,ip=null;
 const cur=()=>PR.find(p=>p.id===P),mb=x=>(x/1048576).toFixed(1)+' MB',today=()=>new Date().toISOString().slice(0,10);
+const tel=()=>{$('#tel').textContent=`GST ${new Date().toLocaleTimeString('en-GB',{timeZone:'Asia/Dubai'})} · PRJ ${PR.length} · PEND ${PEND}`};setInterval(tel,1000);
 const skel=n=>'<div class="skel"></div>'.repeat(n);
 function toast(m,s){const t=$('#toast');t.innerHTML=m;t.hidden=false;if(!s)setTimeout(()=>t.hidden=true,3500)}
 function dl(n,b){const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=n;a.click()}
 function printHTML(h){$('#printarea').innerHTML=h;setTimeout(()=>print(),100)}
 async function load(){PR=await DB.all('projects');const a=await DB.get('kv','active');P=a&&PR.some(p=>p.id===a.v)?a.v:(PR[0]&&PR[0].id)||null;$('#ps').innerHTML=PR.map(p=>`<option value="${p.id}" ${p.id===P?'selected':''}>${esc(p.name)}</option>`).join('')||'<option>No project</option>';$('#ps').parentNode.querySelector('label')||$('#ps').insertAdjacentHTML('afterend','<label>Active Project</label>')}
 async function setP(id){await DB.put('kv',{id:'active',v:id});await load();show(view)}
-async function badge(){const n=(await DB.all('docs')).filter(x=>ROLES.some(r=>!x.sigs[r])).length;try{n?await navigator.setAppBadge(n):await navigator.clearAppBadge()}catch(e){}}
+async function badge(){const n=(await DB.all('docs')).filter(x=>ROLES.some(r=>!x.sigs[r])).length;PEND=n;tel();try{n?await navigator.setAppBadge(n):await navigator.clearAppBadge()}catch(e){}}
 const changed=()=>{badge();bc&&bc.postMessage({t:'sync'})};
 const fld=(f,v='',req)=>`<div class="f${f[2]==='date'?' up':''}"><input name="${f[0]}" type="${f[2]||'text'}" value="${esc(v)}" placeholder=" " ${req?'required':''}><label>${f[1]}</label></div>`;
 const area=(id,l)=>`<div class="f"><textarea id="${id}" rows="3" placeholder=" "></textarea><label>${l}</label></div>`;
 const need=()=>`<div class="card"><h3>${ic('bulb')} No project selected</h3><p>Pick a project in the header, or start with a ready-made sample.</p>${skel(2)}${bt('dl','Load Sample AGAC Project','','data-smp')}${bt('chart','Go to Dashboard','s','data-go="dash"')}</div>`;
 function docHTML(d){const T=TEMPLATES[d.type];return `<div class="doc"><h1>${esc(T.name)}</h1><p><b>Al Gurg Automation and Controls (AGAC)</b> · Dubai, UAE · ${esc(d.title)}</p>${T.body(Object.fromEntries(Object.entries(d.data).map(([k,v])=>[k,esc(v)])))}<div class="sigs">${ROLES.map(r=>`<div><b>${r}</b><br>${d.sigs[r]?`<img src="${d.sigs[r]}">`:'<br><br>'}<hr></div>`).join('')}</div></div>`}
-async function sample(){const id=crypto.randomUUID(),t=Date.now(),n='Sample WTP Pumping SCADA Upgrade',j='AGAC-2026-0142',c='Sample Water Utility';
-await DB.put('projects',{id,name:n,jobNo:j,client:c,sector:'Water & Wastewater',created:t});await DB.put('kv',{id:'plan:'+id,m:{0:true,1:true,2:true},q:{0:true,1:true}});
-const d={project:n,jobNo:j,client:c,sector:'Water & Wastewater',consultant:'Sample Consultant',platform:'System Platform 2023 R2',tags:'PMP_101.RUN, PMP_101.FLT, TK_201.LVL',date:today(),location:'AGAC Dubai Workshop',result:'Pass with punch list',punch:'Category B: update alarm text for TK_201'};
-await DB.put('docs',{id:crypto.randomUUID(),pid:id,type:'fat',title:n+' – '+TEMPLATES.fat.name,data:d,sigs:Object.fromEntries(ROLES.map(r=>[r,null])),created:t});
-await DB.put('reports',{id:crypto.randomUUID(),pid:id,date:today(),type:'Daily',progress:'Tag testing 60% complete.',blockers:'Awaiting client tag list rev C',created:t});
-await DB.put('kv',{id:'active',v:id});await load();show('dash');changed();toast('Sample project loaded ✔')}
+async function sample(){const t=Date.now(),S=[
+{n:'Ruwais Pipeline RTU & Custody Transfer SCADA',j:'AGAC-2026-0187',c:'Sample Oil & Gas Operator',s:'Oil & Gas',tg:'FT_1001.FLOW, PT_1002.PRESS, ESD_1003.TRIP, XV_1004.POS',m:[0,1,2,3],q:[0,1,2],pun:'Cat A: none. Cat B: ESD_1003 trip-latch alarm text. Cat C: update P&ID rev tags.',b:'Awaiting client tag list rev C for custody-transfer meters'},
+{n:'Dubai District Cooling Plant ETS Optimisation',j:'AGAC-2026-0203',c:'Sample District Cooling Operator',s:'District Cooling Plants',tg:'CH_01.KW, CH_01.CHWST, CH_01.CHWRT, ETS_12.BTU',m:[0,1,2],q:[0,1],pun:'Cat B: chiller sequencing trend scaling. Cat C: ETS meter naming.',b:''}];let first=null;
+for(const x of S){const id=crypto.randomUUID();first=first||id;await DB.put('projects',{id,name:x.n,jobNo:x.j,client:x.c,sector:x.s,created:t});
+await DB.put('kv',{id:'plan:'+id,m:Object.fromEntries(x.m.map(i=>[i,true])),q:Object.fromEntries(x.q.map(i=>[i,true]))});
+const d={project:x.n,jobNo:x.j,client:x.c,sector:x.s,consultant:'Sample Consultant',platform:'System Platform 2023 R2',tags:x.tg,date:today(),location:'AGAC Dubai Workshop',result:'Pass with punch list',punch:x.pun};
+await DB.put('docs',{id:crypto.randomUUID(),pid:id,type:'fat',title:x.n+' – '+TEMPLATES.fat.name,data:d,sigs:Object.fromEntries(ROLES.map(r=>[r,null])),created:t});
+await DB.put('reports',{id:crypto.randomUUID(),pid:id,date:today(),type:'Daily',progress:'FAT checklist: comms, tag testing and redundancy failover executed.',blockers:x.b,created:t})}
+await DB.put('kv',{id:'active',v:first});await load();show('dash');changed();toast('2 sample projects saved to IndexedDB ✔')}
 const kpi=(l,v,s,c)=>`<div class="card kpi" style="--k:${c}"><small>${l}</small><b>${v}</b><span>${s}</span></div>`;
 const V={
 async dash(){const docs=await DB.all('docs'),reps=await DB.all('reports'),e=await DB.estimate();
@@ -46,17 +50,17 @@ async rep(){if(!P)return need();const a=(await DB.all('reports')).filter(r=>r.pi
 async store(){const e=await DB.estimate(),pc=e.quota?e.usage/e.quota*100:0,ps=navigator.storage&&navigator.storage.persisted?await navigator.storage.persisted():false;return `<div class="card"><h3>Storage</h3><div class="bar"><i style="width:${Math.max(pc,.5)}%"></i></div><p class="mono">${mb(e.usage||0)} / ${mb(e.quota||0)} (${pc.toFixed(2)}%) · persistent: ${ps?'granted':'not granted'}</p>${bt('dl','Backup everything (.agac)','','id="bk"')}<label class="btn s">${ic('refresh')}<span>Restore .agac / .json</span><input type="file" id="rst" accept=".agac,.json" hidden></label></div>`}};
 async function show(v){view=v;history.replaceState(null,'','#'+v);document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));$('#view').innerHTML=await V[v]();bind[v]&&bind[v]();scrollTo(0,0)}
 async function importFile(f){try{const n=await DB.importAll(JSON.parse(await f.text()));await load();await show(view);changed();toast(`Imported ${n} records ✔`)}catch(x){toast('Import failed: '+esc(x.message))}}
-const bind={dash(){const b=$('#np');b&&(b.onclick=async()=>{const g=n=>document.querySelector(`#view [name=${n}]`).value.trim();if(!g('name'))return toast('Enter a project name');const id=crypto.randomUUID();await DB.put('projects',{id,name:g('name'),jobNo:g('jobNo'),client:g('client'),sector:g('sector'),created:Date.now()});await DB.put('kv',{id:'active',v:id});await load();show('dash')});
+const bind={dash(){const b=$('#np');b&&(b.onclick=async()=>{const g=n=>document.querySelector(`#view [name=${n}]`).value.trim();if(!g('name'))return toast('Enter a project name');const id=crypto.randomUUID();await DB.put('projects',{id,name:g('name'),jobNo:g('jobNo'),client:g('client'),sector:g('sector'),created:Date.now()});await DB.put('kv',{id:'active',v:id});await load();show('dash');toast('Project committed to IndexedDB ✔')});
 document.querySelectorAll('[data-sw]').forEach(b=>b.onclick=()=>setP(b.dataset.sw));
 document.querySelectorAll('[data-ex]').forEach(b=>b.onclick=async()=>dl(PR.find(p=>p.id===b.dataset.ex).name.replace(/\W+/g,'_')+'.agac',new Blob([JSON.stringify(await DB.exportAll(b.dataset.ex))],{type:'application/x-agac'})));
 document.querySelectorAll('[data-rm]').forEach(b=>b.onclick=async()=>{if(confirm('Delete this project and ALL its documents and reports?')){await DB.removeProject(b.dataset.rm);await load();show('dash');changed()}})},
 gen(){const p=cur(),fs=()=>{const t=TEMPLATES[$('#tp').value],pre={project:p.name,jobNo:p.jobNo,client:p.client,date:today()};$('#fs').innerHTML=[...COMMON,...t.extra].map(f=>fld(f,pre[f[0]]||'',['project','jobNo','client'].includes(f[0]))).join('')};$('#tp').onchange=fs;fs();pads=ROLES.map((r,i)=>new Pad($('#sg'+i)));document.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>pads[b.dataset.c].clear());
 const collect=()=>{const t=$('#tp').value,data={sector:p.sector};document.querySelectorAll('#fs input').forEach(i=>data[i.name]=i.value);const sigs={};ROLES.forEach((r,i)=>sigs[r]=pads[i].data());return{id:crypto.randomUUID(),pid:P,type:t,title:(data.project||'Untitled')+' – '+TEMPLATES[t].name,data,sigs,created:Date.now()}};
 const ok=()=>{$('#fs').classList.add('was-validated');if(document.querySelectorAll('#fs input:invalid').length){toast('Complete the highlighted fields');return false}return true};
-$('#save').onclick=async()=>{if(!ok())return;await DB.put('docs',collect());changed();toast('Saved ✔')};$('#prev').onclick=()=>ok()&&printHTML(docHTML(collect()))},
+$('#save').onclick=async()=>{if(!ok())return;const d=collect();await DB.put('docs',d);changed();toast('Document + '+ROLES.filter(r=>d.sigs[r]).length+' signature(s) committed to IndexedDB ✔')};$('#prev').onclick=()=>ok()&&printHTML(docHTML(collect()))},
 docs(){document.querySelectorAll('[data-p]').forEach(b=>b.onclick=async()=>printHTML(docHTML(await DB.get('docs',b.dataset.p))))},
-plan(){document.querySelectorAll('[data-k]').forEach(c=>c.onchange=async()=>{window._p[c.dataset.k][c.dataset.i]=c.checked;await DB.put('kv',window._p);bc&&bc.postMessage({t:'sync'});show('plan')})},
-rep(){$('#rs').onclick=async()=>{const g=n=>document.querySelector(`#view [name=${n}]`).value;await DB.put('reports',{id:crypto.randomUUID(),pid:P,date:g('date'),type:g('type'),progress:$('#rp').value,blockers:$('#rb').value,created:Date.now()});changed();toast('Report saved ✔');show('rep')};
+plan(){document.querySelectorAll('[data-k]').forEach(c=>c.onchange=async()=>{window._p[c.dataset.k][c.dataset.i]=c.checked;await DB.put('kv',window._p);bc&&bc.postMessage({t:'sync'});toast('Progress committed to IndexedDB ✔');show('plan')})},
+rep(){$('#rs').onclick=async()=>{const g=n=>document.querySelector(`#view [name=${n}]`).value;await DB.put('reports',{id:crypto.randomUUID(),pid:P,date:g('date'),type:g('type'),progress:$('#rp').value,blockers:$('#rb').value,created:Date.now()});changed();toast('Report committed to IndexedDB ✔');show('rep')};
 document.querySelectorAll('[data-cl]').forEach(b=>b.onclick=async()=>{const r=await DB.get('reports',b.dataset.cl);r.cleared=true;await DB.put('reports',r);changed();show('rep')});
 document.querySelectorAll('[data-r]').forEach(b=>b.onclick=async()=>{const r=await DB.get('reports',b.dataset.r);printHTML(`<div class="doc"><h1>SCADA ${esc(r.type)} Progress Report</h1><p>${esc(cur().name)} · ${esc(r.date)}</p><h3>Progress</h3><p>${esc(r.progress)}</p><h3>Blockers</h3><p>${esc(r.blockers)}</p></div>`)})},
 store(){$('#bk').onclick=async()=>dl('compliancepaper-backup-'+today()+'.agac',new Blob([JSON.stringify(await DB.exportAll())],{type:'application/x-agac'}));$('#rst').onchange=e=>importFile(e.target.files[0])}};
