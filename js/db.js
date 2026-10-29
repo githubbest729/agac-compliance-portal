@@ -1,7 +1,9 @@
-const DB={_d:null,open(){return this._d?Promise.resolve(this._d):new Promise((res,rej)=>{const r=indexedDB.open('compliancepaper',1);r.onupgradeneeded=()=>{['docs','reports','kv'].forEach(s=>r.result.createObjectStore(s,{keyPath:'id'}))};r.onsuccess=()=>{this._d=r.result;res(r.result)};r.onerror=()=>rej(r.error)})},
+const DB={_d:null,open(){return this._d?Promise.resolve(this._d):new Promise((res,rej)=>{const r=indexedDB.open('compliancepaper',2);r.onupgradeneeded=()=>{['projects','docs','reports','kv'].forEach(s=>{if(!r.result.objectStoreNames.contains(s))r.result.createObjectStore(s,{keyPath:'id'})})};r.onsuccess=()=>{this._d=r.result;res(r.result)};r.onerror=()=>rej(r.error)})},
 async tx(s,m,f){const d=await this.open();return new Promise((res,rej)=>{const t=d.transaction(s,m),q=f(t.objectStore(s));t.oncomplete=()=>res(q&&q.result);t.onerror=()=>rej(t.error)})},
 put(s,o){return this.tx(s,'readwrite',x=>x.put(o))},all(s){return this.tx(s,'readonly',x=>x.getAll())},get(s,id){return this.tx(s,'readonly',x=>x.get(id))},del(s,id){return this.tx(s,'readwrite',x=>x.delete(id))},
 async persist(){try{return navigator.storage&&navigator.storage.persist?await navigator.storage.persist():false}catch(e){return false}},
 async estimate(){try{return await navigator.storage.estimate()}catch(e){return{usage:0,quota:0}}},
-async exportAll(){const o={app:'compliancepaper',version:1,at:new Date().toISOString()};for(const s of['docs','reports','kv'])o[s]=await this.all(s);return o},
-async importAll(o){if(o.app!=='compliancepaper')throw new Error('Not a CompliancePaper backup');for(const s of['docs','reports','kv'])for(const r of o[s]||[])await this.put(s,r)}};
+async exportAll(pid){const o={app:'compliancepaper',version:2,at:new Date().toISOString()};for(const s of['projects','docs','reports','kv'])o[s]=await this.all(s);
+if(pid){o.projects=o.projects.filter(p=>p.id===pid);o.docs=o.docs.filter(d=>d.pid===pid);o.reports=o.reports.filter(r=>r.pid===pid);o.kv=o.kv.filter(k=>k.id==='plan:'+pid)}return o},
+async importAll(o){if(!o||o.app!=='compliancepaper')throw new Error('Not a CompliancePaper backup');let n=0;for(const s of['projects','docs','reports','kv'])for(const r of o[s]||[]){await this.put(s,r);n++}return n},
+async removeProject(pid){await this.del('projects',pid);await this.del('kv','plan:'+pid);for(const s of['docs','reports'])for(const r of await this.all(s))if(r.pid===pid)await this.del(s,r.id)}};

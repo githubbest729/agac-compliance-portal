@@ -13,3 +13,7 @@ button{font:inherit;cursor:pointer}.btn{background:var(--ac);color:#0A2540;borde
 #toast{position:fixed;bottom:1rem;left:50%;transform:translateX(-50%);background:#0A2540;color:#fff;padding:.8rem 1rem;border-radius:8px;border:1px solid var(--ac);z-index:9}
 #printarea{display:none}.doc{background:#fff;color:#000;padding:2rem;font:13px Georgia,serif}.doc h1{font-size:18px;border-bottom:2px solid #0A2540}.doc table{width:100%;border-collapse:collapse}.doc td,.doc th{border:1px solid #999;padding:4px;text-align:left}.doc img{height:60px}.sigs{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1rem}
 @media print{body>*:not(#printarea){display:none!important}#printarea{display:block}}
+header{padding-left:max(1rem,env(titlebar-area-x,0px));padding-right:1rem;min-height:env(titlebar-area-height,3.2rem)}
+.hc{display:flex;gap:.5rem;align-items:center;app-region:no-drag}.hc select{width:auto;max-width:240px}header .brand{app-region:drag}
+@media(max-width:600px){header{flex-wrap:wrap}}.doc h3{font-size:14px;margin:12px 0 2px}.doc p{margin:3px 0;text-align:justify}.doc .fine{font-size:10px;color:#555;margin-top:14px}
+.pill{background:var(--ac);color:#0A2540;border-radius:99px;padding:.1rem .6rem;font-size:.75rem;font-weight:700}.pill.w{background:#f5a623}
