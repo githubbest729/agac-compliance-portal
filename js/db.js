@@ -1,0 +1,7 @@
+const DB={_d:null,open(){return this._d?Promise.resolve(this._d):new Promise((res,rej)=>{const r=indexedDB.open('compliancepaper',1);r.onupgradeneeded=()=>{['docs','reports','kv'].forEach(s=>r.result.createObjectStore(s,{keyPath:'id'}))};r.onsuccess=()=>{this._d=r.result;res(r.result)};r.onerror=()=>rej(r.error)})},
+async tx(s,m,f){const d=await this.open();return new Promise((res,rej)=>{const t=d.transaction(s,m),q=f(t.objectStore(s));t.oncomplete=()=>res(q&&q.result);t.onerror=()=>rej(t.error)})},
+put(s,o){return this.tx(s,'readwrite',x=>x.put(o))},all(s){return this.tx(s,'readonly',x=>x.getAll())},get(s,id){return this.tx(s,'readonly',x=>x.get(id))},del(s,id){return this.tx(s,'readwrite',x=>x.delete(id))},
+async persist(){try{return navigator.storage&&navigator.storage.persist?await navigator.storage.persist():false}catch(e){return false}},
+async estimate(){try{return await navigator.storage.estimate()}catch(e){return{usage:0,quota:0}}},
+async exportAll(){const o={app:'compliancepaper',version:1,at:new Date().toISOString()};for(const s of['docs','reports','kv'])o[s]=await this.all(s);return o},
+async importAll(o){if(o.app!=='compliancepaper')throw new Error('Not a CompliancePaper backup');for(const s of['docs','reports','kv'])for(const r of o[s]||[])await this.put(s,r)}};

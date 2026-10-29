@@ -1,0 +1,3 @@
+class Pad{constructor(c){this.c=c;this.x=c.getContext('2d');this.dirty=false;const r=()=>{const b=c.getBoundingClientRect();c.width=b.width*2;c.height=b.height*2;this.x.scale(2,2);this.x.lineWidth=2;this.x.lineCap='round';this.x.strokeStyle='#0A2540'};r();let d=false;const p=e=>{const b=c.getBoundingClientRect();return[e.clientX-b.left,e.clientY-b.top]};
+c.onpointerdown=e=>{d=true;c.setPointerCapture(e.pointerId);this.x.beginPath();this.x.moveTo(...p(e))};c.onpointermove=e=>{if(d){this.x.lineTo(...p(e));this.x.stroke();this.dirty=true}};c.onpointerup=()=>d=false}
+clear(){this.x.clearRect(0,0,1e4,1e4);this.dirty=false}data(){return this.dirty?this.c.toDataURL('image/png'):null}}
