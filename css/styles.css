@@ -51,7 +51,6 @@ main{display:flex;flex-direction:column;gap:1rem}main>.card,main>.grid2,main>.kp
 .pf{position:fixed;bottom:-12mm;left:0;right:0;font-size:8pt;color:#475569;border-top:1px solid #cbd5e1;padding-top:3px}
 
 @media print{html,body{background:#fff!important;padding:0!important}#printarea .doc{display:block}}
-@page{size:A4 portrait;margin:14mm 16mm 14mm 16mm;@bottom-right{content:"Page " counter(page) " of " counter(pages);font:7pt Arial,sans-serif;color:#64748b;text-transform:uppercase}}
 @media print{#printarea{box-sizing:border-box;width:100%;margin:0;padding:0;color:#0f172a;background:#ffffff;-webkit-print-color-adjust:exact;print-color-adjust:exact}#printarea *{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
 .doc{font:9.25pt/1.38 Inter,Arial,sans-serif;color:#0f172a}
 .doc p,.doc p.cl{margin:0 0 4px;text-align:justify}.doc h1{font-size:13pt;margin:4px 0 1px}.doc .sub{font-size:8.5pt;margin:0 0 5px}.doc .fine{font-size:7pt;margin-top:5px}
@@ -59,3 +58,18 @@ main{display:flex;flex-direction:column;gap:1rem}main>.card,main>.grid2,main>.kp
 .meta{border:1px solid #94a3b8;background:#f8fafc;font-size:8pt}.meta th,.meta td{border:1px solid #94a3b8!important;padding:3px 6px!important;background:#f8fafc}.meta th{font-weight:700;color:#334155}
 .sig-grid,.print-signatures{page-break-inside:avoid!important;break-inside:avoid!important;margin-top:8px!important}.sg{padding:6px 8px;font-size:8.5pt;break-inside:avoid}.print-sig-box{height:75px!important;margin:4px 0}.ln{font-size:8pt;margin-top:2px}
 .pf{position:fixed;bottom:-11mm;left:0;right:30mm;font-size:7pt;text-transform:uppercase;letter-spacing:.02em;color:#64748b;border-top:1px solid #cbd5e1;padding-top:2px}
+@media print{
+@page{size:A4 portrait;margin:0}
+html,body{margin:0!important;padding:0!important;background:#ffffff!important;color:#0f172a!important}
+header,nav,main,#toast,.modal{display:none!important}
+#printarea{display:block!important;box-sizing:border-box!important;width:210mm!important;max-width:210mm!important;margin:0 auto!important;padding:12mm 16mm 10mm 16mm!important;background:#ffffff!important;color:#0f172a!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;overflow:hidden!important}
+.doc{font-size:8.75pt;line-height:1.32}
+.doc p,.doc p.cl{font-size:8.75pt;line-height:1.32;margin:0 0 3px}
+.doc h1{font-size:13pt;margin:6px 0 2px 0}
+.doc .fine{font-size:6.5pt;margin:4px 0}
+.meta{font-size:7.5pt}.meta th,.meta td{padding:2px 5px!important}
+.sig-grid,.print-signatures{margin-top:6px!important}
+.print-sig-box{height:52px!important}
+.sg small,.ln{font-size:6.5pt}
+.pf{position:fixed;left:16mm;right:16mm;bottom:5mm}
+}
