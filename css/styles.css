@@ -26,3 +26,12 @@ main{max-width:1100px;margin:auto;padding:1rem}.ic{width:20px;height:20px;flex:n
 @media print{body>*:not(#printarea){display:none!important}#printarea{display:block}body{background:#fff}}
 .tel{font:600 .72rem var(--mono);color:var(--mu);letter-spacing:.03em}@media(max-width:600px){.tel{display:none}}
 @media(max-width:767px){nav button{position:relative}nav .on::before{content:'';position:absolute;top:-4px;left:25%;right:25%;height:3px;border-radius:3px;background:var(--cy);box-shadow:0 0 10px var(--cy)}}
+main{max-width:1400px;margin:0 auto;min-height:calc(100vh - 120px)}nav{max-width:1400px}.mu{color:var(--mu)}.dim{opacity:.6}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1rem}.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:1rem}.grid3 .card,.grid2 .card{margin:0}.grid2{margin-bottom:1rem}
+.sc,.tpl{display:flex;flex-direction:column;gap:.3rem;transition:.15s}.sc:hover,.tpl:hover{transform:translateY(-2px);border-color:rgba(0,240,255,.4)}.sc .btn{align-self:flex-start;margin-top:auto}.tpl h3{font-size:1rem}.tpl p{font-size:.8rem;line-height:1.4}
+.banner{display:flex;align-items:center;gap:.8rem;flex-wrap:wrap;border-color:rgba(0,240,255,.35)}.banner span{flex:1;min-width:200px}
+.tw{overflow-x:auto}.tb{width:100%;border-collapse:collapse}.tb th{text-align:left;color:var(--mu);font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;padding:.5rem}.tb td{padding:.6rem .5rem;border-top:1px solid rgba(255,255,255,.07)}.tb tr.cur{background:rgba(0,240,255,.05)}.tb td.act{white-space:nowrap;text-align:right}
+.empty{display:grid;place-items:center;text-align:center;gap:.3rem;min-height:38vh}.empty .ic{width:44px;height:44px;color:var(--cy)}
+.tl{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:.6rem}.st{padding:.8rem;border:1px dashed var(--line);border-radius:12px;opacity:.75}.st b{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;border:1px solid var(--line);font:700 .8rem var(--mono);margin-right:.4rem;color:var(--mu)}
+.f.glow select{border-color:var(--cy);animation:gl 1.8s infinite}@keyframes gl{0%,100%{box-shadow:0 0 0 2px rgba(0,240,255,.4),0 0 18px rgba(0,240,255,.55)}50%{box-shadow:0 0 0 2px rgba(0,240,255,.1),0 0 6px rgba(0,240,255,.15)}}
+.btn:disabled{opacity:.4;pointer-events:none}.tw+*{margin-top:0}
