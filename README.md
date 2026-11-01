@@ -149,6 +149,7 @@ flowchart TD
     style UI fill:#0F172A,stroke:#10B981,stroke-width:2px,color:#F8FAFC
     style LOGIC fill:#1E293B,stroke:#F59E0B,stroke-width:2px,color:#F8FAFC
     style DB fill:#020617,stroke:#38BDF8,stroke-width:2px,color:#F8FAFC
+
 ---
 
 ## SCADA Legal & QA Workflows
