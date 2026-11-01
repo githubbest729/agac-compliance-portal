@@ -90,57 +90,65 @@ The application comes pre-loaded with sector-specific telemetry presets, tag arc
 
 ## System Architecture
 
+## System Architecture
+
 ### High-Level Component Flowchart
 
-┌──────────────────────────────────────────────────────────────────────────────────┐
-│                             CLIENT HARDWARE & OS                                 │
-│  Desktop Control Room (Edge / Chrome)  │  Rugged Field Tablets (iOS / Android)   │
-└────────────────────────┬─────────────────────────────────┬───────────────────────┘
-│                                 │
-▼                                 ▼
-┌──────────────────────────────────────────────────────────────────────────────────┐
-│                              2026 PWA APP SHELL                                  │
-│  ┌───────────────────────┐  ┌──────────────────────┐  ┌───────────────────────┐  │
-│  │   Service Worker      │  │  Manifest & Window   │  │   Hardware & UX APIs  │  │
-│  │   - Cache-First (V3)  │  │  - Window Controls   │  │   - Screen Wake Lock  │  │
-│  │   - BroadcastChannel  │  │  - Protocol Handlers │  │   - Badging API       │  │
-│  │   - Offline Fallback  │  │  - File Associations │  │   - Safe-Area Insets  │  │
-│  └───────────────────────┘  └──────────────────────┘  └───────────────────────┘  │
-└────────────────────────────────────────┬─────────────────────────────────────────┘
-│
-▼
-┌──────────────────────────────────────────────────────────────────────────────────┐
-│                             PRESENTATION LAYER (UI)                              │
-│   Dashboard (KPIs) │ Doc Generator │ Documents Vault │ Plan & QA │ Reports Hub    │
-└────────────────────────────────────────┬─────────────────────────────────────────┘
-│
-▼
-┌──────────────────────────────────────────────────────────────────────────────────┐
-│                            APPLICATION LOGIC CONTROLLERS                         │
-│  ┌─────────────────────┐  ┌───────────────────────┐  ┌────────────────────────┐  │
-│  │   app.js            │  │   templates.js        │  │   signature.js         │  │
-│  │   - Project Switcher│  │   - UAE / GCC Clauses │  │   - HTML5 Multi-Canvas │  │
-│  │   - State & Sync    │  │   - SCADA Tag Formats │  │   - Vector Stamp & PDF │  │
-│  │   - Storage Monitor │  │   - Annexure Compliance│ │   - Hash Validation    │  │
-│  └─────────────────────┘  └───────────────────────┘  └────────────────────────┘  │
-└────────────────────────────────────────┬─────────────────────────────────────────┘
-│
-▼
-┌──────────────────────────────────────────────────────────────────────────────────┐
-│                           PERSISTENT STORAGE ENGINE                              │
-│  IndexedDB Database ("CompliancePaperDB") ── Local Storage Driver               │
-│  ├── Store: 'projects'   ── Sector, Client, Job No., Plant Architecture         │
-│  ├── Store: 'documents'  ── FAT / SAT / PTW Records, Form Data, Audit Hash       │
-│  ├── Store: 'signatures' ── Raw Vector Coordinate Streams & Base64 Signatures    │
-│  ├── Store: 'milestones' ── 7-Phase SCADA Commissioning Progress & QA Punchlists │
-│  └── Store: 'reports'    ── Daily Logs, Active Blockers & Incident Reports       │
-│                                                                                  │
-│  [navigator.storage.persist()] ──► Quota Eviction Lock                           │
-│  [navigator.storage.estimate()]──► Live Telemetry Quota Bar                      │
-│  [JSON / .agac Exporter]       ──► Cross-Device Single-File Portability          │
-└──────────────────────────────────────────────────────────────────────────────────┘
+```mermaid
 
+flowchart TD
+    %% Hardware Layer
+    subgraph HW ["1. CLIENT HARDWARE & OS"]
+        DCR["Desktop Control Room<br/>(Chrome / Edge / Chromium)"]
+        RFT["Rugged Field Tablets<br/>(iOS / iPadOS / Android)"]
+    end
 
+    %% PWA Shell Layer
+    subgraph PWA ["2. 2026 PWA RUNTIME APP SHELL"]
+        direction TB
+        SW["<b>Service Worker (sw.js)</b><br/>• Cache-First Engine (v3)<br/>• BroadcastChannel Sync<br/>• Offline Fallback Intercept"]
+        MAN["<b>Manifest & Desktop Integration</b><br/>• Window Controls Overlay<br/>• Custom Protocol (web+agac://)<br/>• File Association (.agac, .json)"]
+        HARD["<b>Hardware & Ergonomics</b><br/>• Screen Wake Lock API<br/>• App Badging API<br/>• Dynamic Island / Notch Insets"]
+    end
+
+    %% UI Presentation Layer
+    subgraph UI ["3. INDUSTRIAL UI PRESENTATION LAYER"]
+        direction LR
+        DASH["Dashboard & KPIs"]
+        GEN["Doc Generator"]
+        VAULT["Documents Vault"]
+        PLAN["Plan & QA Checklist"]
+        REP["Reports Hub"]
+    end
+
+    %% Application Logic
+    subgraph LOGIC ["4. CLIENT-SIDE CONTROLLERS"]
+        direction TB
+        APP_JS["<b>app.js</b><br/>• Multi-Project Switcher<br/>• Storage Quota Monitor<br/>• Offline / Online State"]
+        TEMP_JS["<b>templates.js</b><br/>• FAT / SAT Contract Clauses<br/>• UAE / Dubai Legal Wording<br/>• Annexure-SCT-HR-001 (PTW)"]
+        SIG_JS["<b>signature.js</b><br/>• 4-Party Canvas Signature<br/>• Time-Stamp Watermarking<br/>• Audit Record Generator"]
+    end
+
+    %% Storage Layer
+    subgraph DB ["5. ZERO-EVICTION PERSISTENT STORAGE (IndexedDB)"]
+        direction TB
+        IDB[("<b>CompliancePaperDB</b><br/>navigator.storage.persist() Enabled")]
+        STORES["Stores: 'projects' • 'documents' • 'signatures' • 'milestones' • 'reports'"]
+        EXPORT["Backup / Portability: Full JSON & .agac Single-Click Export / Restore"]
+        IDB --- STORES --- EXPORT
+    end
+
+    HW --> PWA
+    PWA --> UI
+    UI --> LOGIC
+    LOGIC --> DB
+
+    %% Styling
+    style HW fill:#0F172A,stroke:#38BDF8,stroke-width:2px,color:#F8FAFC
+    style PWA fill:#1E293B,stroke:#00F0FF,stroke-width:2px,color:#F8FAFC
+    style UI fill:#0F172A,stroke:#10B981,stroke-width:2px,color:#F8FAFC
+    style LOGIC fill:#1E293B,stroke:#F59E0B,stroke-width:2px,color:#F8FAFC
+    style DB fill:#020617,stroke:#38BDF8,stroke-width:2px,color:#F8FAFC
 ---
 
 ## SCADA Legal & QA Workflows
