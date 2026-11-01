@@ -90,12 +90,6 @@ The application comes pre-loaded with sector-specific telemetry presets, tag arc
 
 ## System Architecture
 
-## System Architecture
-
-### High-Level Component Flowchart
-
-## System Architecture
-
 ### High-Level Component Flowchart
 
 ```mermaid
