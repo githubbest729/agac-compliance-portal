@@ -94,25 +94,28 @@ The application comes pre-loaded with sector-specific telemetry presets, tag arc
 
 ### High-Level Component Flowchart
 
-```mermaid
+## System Architecture
 
+### High-Level Component Flowchart
+
+```mermaid
 flowchart TD
     %% Hardware Layer
-    subgraph HW ["1. CLIENT HARDWARE & OS"]
-        DCR["Desktop Control Room<br/>(Chrome / Edge / Chromium)"]
-        RFT["Rugged Field Tablets<br/>(iOS / iPadOS / Android)"]
+    subgraph HW["1. CLIENT HARDWARE & OS"]
+        DCR["Desktop Control Room (Chrome / Edge)"]
+        RFT["Rugged Field Tablets (iOS / Android)"]
     end
 
     %% PWA Shell Layer
-    subgraph PWA ["2. 2026 PWA RUNTIME APP SHELL"]
+    subgraph PWA["2. 2026 PWA RUNTIME APP SHELL"]
         direction TB
-        SW["<b>Service Worker (sw.js)</b><br/>• Cache-First Engine (v3)<br/>• BroadcastChannel Sync<br/>• Offline Fallback Intercept"]
-        MAN["<b>Manifest & Desktop Integration</b><br/>• Window Controls Overlay<br/>• Custom Protocol (web+agac://)<br/>• File Association (.agac, .json)"]
-        HARD["<b>Hardware & Ergonomics</b><br/>• Screen Wake Lock API<br/>• App Badging API<br/>• Dynamic Island / Notch Insets"]
+        SW["Service Worker (sw.js) - Cache-First, BroadcastChannel Sync, Offline Fallback"]
+        MAN["Manifest & Desktop Integration - Window Controls Overlay, web+agac://, .agac / .json"]
+        HARD["Hardware & Ergonomics - Screen Wake Lock API, Badging API, Safe-Area Insets"]
     end
 
     %% UI Presentation Layer
-    subgraph UI ["3. INDUSTRIAL UI PRESENTATION LAYER"]
+    subgraph UI["3. INDUSTRIAL UI PRESENTATION LAYER"]
         direction LR
         DASH["Dashboard & KPIs"]
         GEN["Doc Generator"]
@@ -122,18 +125,18 @@ flowchart TD
     end
 
     %% Application Logic
-    subgraph LOGIC ["4. CLIENT-SIDE CONTROLLERS"]
+    subgraph LOGIC["4. CLIENT-SIDE CONTROLLERS"]
         direction TB
-        APP_JS["<b>app.js</b><br/>• Multi-Project Switcher<br/>• Storage Quota Monitor<br/>• Offline / Online State"]
-        TEMP_JS["<b>templates.js</b><br/>• FAT / SAT Contract Clauses<br/>• UAE / Dubai Legal Wording<br/>• Annexure-SCT-HR-001 (PTW)"]
-        SIG_JS["<b>signature.js</b><br/>• 4-Party Canvas Signature<br/>• Time-Stamp Watermarking<br/>• Audit Record Generator"]
+        APP_JS["app.js - Multi-Project Switcher, Storage Quota Monitor, Offline/Online State"]
+        TEMP_JS["templates.js - FAT / SAT Clauses, UAE Legal Wording, Annexure-SCT-HR-001 (PTW)"]
+        SIG_JS["signature.js - 4-Party Canvas Signature, Timestamp Watermarking, PDF Export"]
     end
 
     %% Storage Layer
-    subgraph DB ["5. ZERO-EVICTION PERSISTENT STORAGE (IndexedDB)"]
+    subgraph DB["5. ZERO-EVICTION PERSISTENT STORAGE (IndexedDB)"]
         direction TB
-        IDB[("<b>CompliancePaperDB</b><br/>navigator.storage.persist() Enabled")]
-        STORES["Stores: 'projects' • 'documents' • 'signatures' • 'milestones' • 'reports'"]
+        IDB[("CompliancePaperDB (navigator.storage.persist enabled)")]
+        STORES["Stores: projects, documents, signatures, milestones, reports"]
         EXPORT["Backup / Portability: Full JSON & .agac Single-Click Export / Restore"]
         IDB --- STORES --- EXPORT
     end
@@ -143,14 +146,13 @@ flowchart TD
     UI --> LOGIC
     LOGIC --> DB
 
-    %% Styling
     style HW fill:#0F172A,stroke:#38BDF8,stroke-width:2px,color:#F8FAFC
     style PWA fill:#1E293B,stroke:#00F0FF,stroke-width:2px,color:#F8FAFC
     style UI fill:#0F172A,stroke:#10B981,stroke-width:2px,color:#F8FAFC
     style LOGIC fill:#1E293B,stroke:#F59E0B,stroke-width:2px,color:#F8FAFC
     style DB fill:#020617,stroke:#38BDF8,stroke-width:2px,color:#F8FAFC
+```
 
----
 
 ## SCADA Legal & QA Workflows
 
