@@ -1,5 +1,5 @@
 const COMMON=[['project','Project Name'],['jobNo','AGAC Job No.'],['client','Client'],['consultant','Consultant'],['platform','Wonderware / System Platform Version'],['tags','PLC / OPC Interface Tags'],['date','Date','date']];
-const CL=a=>a.map((t,i)=>`<p><b>${i+1}.</b> ${t}</p>`).join('');
+const CL=a=>a.map((t,i)=>`<p class="cl"><b>${i+1}.</b> ${t}</p>`).join('');
 const PT=d=>`<p>This document is made on <b>${d.date}</b> between <b>Al Gurg Automation and Controls LLC</b>, Dubai, United Arab Emirates ("AGAC") and <b>${d.client}</b> (the "Client"), with ${d.consultant||'the Client\'s consultant'} acting as consultant, in respect of project <b>${d.project}</b>, AGAC Job No. <b>${d.jobNo}</b> (the "Project"), sector: ${d.sector||'-'}.</p>`;
 const LAW='Governing law and disputes: this document is governed by the federal laws of the United Arab Emirates as applied in the Emirate of Dubai. The parties shall first seek amicable resolution through senior representatives within 30 days, failing which the dispute is referred to the competent courts of Dubai.';
 const FINE='<p class="fine">Template supplied for AGAC engineering use. It should be reviewed by AGAC legal counsel before being relied upon as a binding instrument.</p>';
