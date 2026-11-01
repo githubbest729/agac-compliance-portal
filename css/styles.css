@@ -85,3 +85,4 @@ header,nav,main,#toast,.modal{display:none!important}
 .sline{border-bottom:1px solid #94a3b8;margin:4px 0}.sm{font-size:6.5pt;color:#64748b;line-height:1.5}
 .pf{position:static!important;margin-top:4px;padding-top:3px;text-align:center;font-size:6.5pt;letter-spacing:.08em;text-transform:uppercase;color:#64748b;border-top:1px solid #cbd5e1}
 }
+@media print{.ph{border-bottom:0!important;padding-bottom:0!important}.hrule{margin-top:6px;border-top:2px solid #0f172a}}
